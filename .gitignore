@@ -17,3 +17,7 @@ wheels/
 
 # Output files
 output*.md
+
+# Agent files
+*AGENT*.*
+*CLAUDE*.*
