@@ -1,6 +1,6 @@
 # Inktvis
 
-Convert scanned book pages (JPEG) into a single, well-structured Markdown file — optimized for use as LLM context.
+Convert scanned book pages (JPEG/PNG) into a single, well-structured Markdown file — optimized for use as LLM context.
 
 For projects that require ingestion of information that is only available in hard copy.
 
@@ -118,7 +118,7 @@ uv run inktvis ./scans output.md --mode local --verbose
 inktvis <input_dir> <output_file> [options]
 
 Arguments:
-  input_dir              Directory containing scan JPEGs
+  input_dir              Directory containing scan images (JPEG/PNG)
   output_file            Path for the output Markdown file
 
 Options:
@@ -148,8 +148,8 @@ Each page image is sent to a vision LLM with a structured prompt that instructs 
 
 ## Input requirements
 
-- JPEG files in a single directory
-- Filenames with numeric ordering (e.g., `Scan 1.jpeg`, `Scan 2.jpeg`, ...)
+- JPEG or PNG files in a single directory (can be mixed)
+- Filenames with numeric ordering (e.g., `Scan 1.jpeg`, `Scan 2.jpeg`, `0001.png`, ...)
 - 300 DPI recommended (works at other resolutions but accuracy may vary)
 
 ### Page ordering and gaps in numbering

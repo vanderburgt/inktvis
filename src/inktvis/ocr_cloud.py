@@ -22,12 +22,13 @@ non-fiction textbook. Your task:
    - Preserve paragraph breaks
    - Footnote markers → [^N] inline
    - Footnote text (usually at page bottom) → [^N]: text
-   - Tables → Markdown tables using | col | col | syntax with a header separator row
+   - Tables → Markdown tables using | col | col | syntax with a header separator row.
+     IMPORTANT: Keep separator rows short, e.g. | --- | --- |. Never repeat dashes excessively.
    - Diagrams, flowcharts, or architectural figures → reproduce as compact ASCII art
      inside a fenced code block. Use boxes (+--+), arrows (-->, <--), labels, and spatial
      layout. Use plain ASCII characters: +, -, |, >, <, v, ^.
-     Keep diagrams concise — max 30 lines. Simplify complex visuals rather than
-     generating excessive vertical/horizontal spacing.
+     Keep diagrams concise — max 30 lines, max 80 characters wide. Simplify complex visuals
+     rather than generating excessive vertical/horizontal spacing.
    - Photos or other non-diagrammatic images → describe as a blockquote:
      > [Image]: Description of the visual content
 
@@ -66,7 +67,7 @@ async def ocr_page(
         httpx.HTTPStatusError: After MAX_RETRIES failed attempts.
     """
     image_data = base64.b64encode(image_path.read_bytes()).decode("utf-8")
-    mime_type = "image/jpeg"
+    mime_type = "image/png" if image_path.suffix.lower() == ".png" else "image/jpeg"
 
     payload = {
         "model": model,
@@ -109,6 +110,8 @@ async def ocr_page(
                 text = data["choices"][0]["message"]["content"]
                 # Strip code fences if the model wraps output
                 text = _strip_code_fences(text)
+                # Fix runaway repeated characters (model hallucination)
+                text = _collapse_runaway_lines(text)
                 # Extract page number marker from first line
                 text, page_number = _extract_page_number(text)
 
@@ -126,6 +129,23 @@ async def ocr_page(
 
     # Should not reach here, but satisfy type checker
     raise RuntimeError("Max retries exceeded")
+
+
+def _collapse_runaway_lines(text: str) -> str:
+    """Collapse runaway repeated characters on excessively long lines.
+
+    Vision models sometimes hallucinate endless dashes in table separators
+    and ASCII art borders, producing lines of 100K+ characters.
+    """
+    lines = text.split("\n")
+    result = []
+    for line in lines:
+        if len(line) > 500:
+            line = re.sub(r"-{4,}", "---", line)
+            line = re.sub(r"={4,}", "===", line)
+            line = re.sub(r"_{4,}", "___", line)
+        result.append(line)
+    return "\n".join(result)
 
 
 def _strip_code_fences(text: str) -> str:

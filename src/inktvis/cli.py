@@ -23,7 +23,7 @@ console = Console()
 
 def _sort_scans(input_dir: Path) -> list[Path]:
     """Sort scan files by numeric suffix extracted from filenames."""
-    extensions = {".jpg", ".jpeg"}
+    extensions = {".jpg", ".jpeg", ".png"}
     files = [f for f in input_dir.iterdir() if f.suffix.lower() in extensions]
 
     def extract_number(path: Path) -> int:

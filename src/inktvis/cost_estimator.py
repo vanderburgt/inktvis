@@ -42,7 +42,7 @@ def estimate_cost(input_dir: Path, model: str) -> tuple[float, int]:
 
 def _count_pages(input_dir: Path) -> int:
     """Count JPEG files in the input directory."""
-    extensions = {".jpg", ".jpeg"}
+    extensions = {".jpg", ".jpeg", ".png"}
     return sum(1 for f in input_dir.iterdir() if f.suffix.lower() in extensions)
 
 
